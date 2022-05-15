@@ -19,6 +19,7 @@ String getErrorMsg(ex) {
   }
 
   if (ex.type == DioErrorType.other) {
+    debugPrint(ex.toString());
     return 'Something went wrong';
   }
   return ex.message;

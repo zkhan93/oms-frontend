@@ -9,8 +9,8 @@ part 'ApiClient.g.dart';
 
 const secureStorage = FlutterSecureStorage();
 
-// @RestApi(baseUrl: "http://localhost:8081/")
-@RestApi(baseUrl: "http://10.0.2.2:8081/")
+@RestApi(baseUrl: "http://192.168.1.56:8081/")
+// @RestApi(baseUrl: "http://10.0.2.2:8081/")
 abstract class ApiClient {
   factory ApiClient({String? baseUrl}) {
     Dio dio = Dio();

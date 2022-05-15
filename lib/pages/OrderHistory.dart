@@ -5,6 +5,8 @@ import 'package:order/services/models/Order.dart';
 import 'package:order/services/models/OrderResponse.dart';
 import 'package:provider/provider.dart';
 
+import '../components/PageMessage.dart';
+
 class OrderHistory extends StatefulWidget {
   const OrderHistory({Key? key}) : super(key: key);
 
@@ -42,7 +44,14 @@ class _OrderHistoryState extends State<OrderHistory> {
             child: Consumer<OrdersModel>(
                 //                    <--- Consumer
                 builder: (context, orderModel, child) {
-              if (orderModel.error.isNotEmpty) return Text(orderModel.error);
+              if (orderModel.error.isNotEmpty) {
+                return Center(
+                    widthFactor: 1,
+                    child: Text(
+                      orderModel.error,
+                      textAlign: TextAlign.center,
+                    ));
+              }
               if (orderModel.orders.isNotEmpty) {
                 return ListView.builder(
                     shrinkWrap: true,
@@ -67,7 +76,11 @@ class _OrderHistoryState extends State<OrderHistory> {
                       ));
                     });
               }
-              return const Text("No items");
+              return const PageMessage(
+                  title: "You have not placed any orders!",
+                  subtitle:
+                      "Your orders will be listed here\n Click on + icon to create new order",
+                  icon: Icons.sentiment_dissatisfied_sharp);
             })));
   }
 
