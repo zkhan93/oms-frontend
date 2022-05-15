@@ -154,9 +154,9 @@ class _OrderDetailsState extends State<OrderDetails> {
       },
     );
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Orders Detail"),
-        ),
+        appBar: AppBar(title: const Text("Orders Detail"), actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.logout))
+        ]),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 32.0, 8.0, 8.0),
           child: orderProvider,

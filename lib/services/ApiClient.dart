@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:order/services/models/Order.dart';
 import 'package:order/services/models/OrderDetail.dart';
 import 'package:order/services/models/Token.dart';
 import 'package:order/services/models/OrderResponse.dart';
@@ -10,6 +9,7 @@ part 'ApiClient.g.dart';
 
 const secureStorage = FlutterSecureStorage();
 
+// @RestApi(baseUrl: "http://localhost:8081/")
 @RestApi(baseUrl: "http://10.0.2.2:8081/")
 abstract class ApiClient {
   factory ApiClient({String? baseUrl}) {
@@ -39,7 +39,7 @@ abstract class ApiClient {
   Future<OrderResponse> getOrders();
 
   @POST("/order/")
-  Future<Order> createOrder(@Body() Map<String, dynamic> data);
+  Future<OrderDetail> createOrder(@Body() Map<String, dynamic> data);
 
   @GET("/order/{id}/")
   Future<OrderDetail> getOrder(@Path("id") int orderId);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:order/pages/LoginPage.dart';
 import 'package:order/pages/OrderCreate.dart';
 import 'package:order/pages/OrderDetails.dart';
-import 'package:order/pages/OrdersPage.dart';
+import 'package:order/pages/OrderHistory.dart';
 import 'package:order/pages/SignupPage.dart';
 import 'package:order/services/ApiClient.dart';
 import 'package:provider/provider.dart';
@@ -23,26 +23,28 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Order App',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.blue,
+          errorColor: Colors.red[300]),
+      initialRoute: "/",
       home: FutureBuilder<String?>(
         future: globals.secureStorage.read(
           key: "token",
         ),
         builder: (BuildContext context, AsyncSnapshot<String?> token) {
-          if (token.hasData) {
-            return const OrderHistory();
+          debugPrint("token data ${token.hasData} ${token.data}");
+          if (!token.hasData || token.data == null) {
+            return const LoginPage();
           }
-          return const LoginPage();
+          return const OrderHistory();
         },
       ),
       routes: <String, WidgetBuilder>{

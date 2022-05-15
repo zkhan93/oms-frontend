@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:order/globals.dart' as globals;
+import 'package:order/pages/OrderHistory.dart';
+import 'package:order/services/models/OrderDetail.dart';
 
 class OrderCreate extends StatefulWidget {
   const OrderCreate({Key? key}) : super(key: key);
@@ -9,6 +11,7 @@ class OrderCreate extends StatefulWidget {
 }
 
 class _OrderCreateState extends State<OrderCreate> {
+  bool loading = false;
   List<Map> items = [
     {
       "name": TextEditingController(),
@@ -19,19 +22,32 @@ class _OrderCreateState extends State<OrderCreate> {
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: const Text("Create New Order"),
         ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.check),
           onPressed: () {
-            _createOrder();
-            // .then(() {
-            //   Navigator.popAndPushNamed(context, "/orders");
-            // }).catchError((error) {
-            //   debugPrint("error occurred!");
+            // setState(() {
+            //   loading = true;
             // });
+            _createOrder().then((newOrder) {
+              debugPrint("order created ${newOrder.toJson()}");
+              // setState(() {
+              //   loading = false;
+              // });
+              Navigator.pop(context);
+              Navigator.popAndPushNamed(context, "/orders",
+                  arguments: OrdersPageArguments("Order created successfully"));
+            }).catchError((error) {
+              debugPrint("error occurred!");
+              // setState(() {
+              //   loading = true;
+              // });
+            });
           },
         ),
         body: Padding(
@@ -104,7 +120,7 @@ class _OrderCreateState extends State<OrderCreate> {
     });
   }
 
-  _createOrder() {
+  Future<OrderDetail> _createOrder() {
     var orderItems = [];
     items.forEach((element) {
       var tmp = {};
@@ -114,7 +130,7 @@ class _OrderCreateState extends State<OrderCreate> {
       orderItems.add(tmp);
     });
     var order = {"items": orderItems};
-    globals.apiClient.createOrder(order);
+    return globals.apiClient.createOrder(order);
   }
 
   _removeItem(index) {

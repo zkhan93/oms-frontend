@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:order/pages/OrderDetails.dart';
-import 'package:order/pages/OrdersPage.dart';
+import 'package:order/pages/OrderHistory.dart';
 import 'package:order/services/models/Order.dart';
 import 'package:provider/provider.dart';
 

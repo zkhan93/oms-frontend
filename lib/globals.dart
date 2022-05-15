@@ -39,3 +39,22 @@ Map? getErrorResponse(ex) {
   }
   return response;
 }
+
+List<Widget> getDefaultActions(context) {
+  return <Widget>[
+    IconButton(
+        onPressed: () async {
+          if (await secureStorage.containsKey(key: "token")) {
+            await secureStorage.delete(key: "token");
+          }
+
+          Navigator.popAndPushNamed(context, "/");
+        },
+        icon: const Icon(Icons.logout)),
+    IconButton(
+        onPressed: () async {
+          debugPrint("tada");
+        },
+        icon: const Icon(Icons.pest_control))
+  ];
+}

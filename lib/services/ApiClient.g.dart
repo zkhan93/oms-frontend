@@ -53,19 +53,19 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<Order> createOrder(data) async {
+  Future<OrderDetail> createOrder(data) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(data);
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<Order>(
+        _setStreamType<OrderDetail>(
             Options(method: 'POST', headers: _headers, extra: _extra)
                 .compose(_dio.options, '/order/',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Order.fromJson(_result.data!);
+    final value = OrderDetail.fromJson(_result.data!);
     return value;
   }
 
