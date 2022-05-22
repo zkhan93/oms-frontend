@@ -1,10 +1,15 @@
+import 'dart:ffi';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:order/services/ApiClient.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 ApiClient apiClient = ApiClient();
 const secureStorage = FlutterSecureStorage();
+
+const rs = "₹";
 
 String getErrorMsg(ex) {
   if (ex.type == DioErrorType.response) {
@@ -41,21 +46,35 @@ Map? getErrorResponse(ex) {
   return response;
 }
 
-List<Widget> getDefaultActions(context) {
+Future<List<Widget>> getDefaultActions(context) async {
+  List<String> roles = await getRoles();
   return <Widget>[
     IconButton(
         onPressed: () async {
           if (await secureStorage.containsKey(key: "token")) {
             await secureStorage.delete(key: "token");
           }
-
-          Navigator.popAndPushNamed(context, "/");
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              "/login", (Route<dynamic> route) => false);
         },
         icon: const Icon(Icons.logout)),
-    IconButton(
-        onPressed: () async {
-          debugPrint("tada");
-        },
-        icon: const Icon(Icons.pest_control))
+    if (roles.contains("admin"))
+      IconButton(
+          onPressed: () {
+            Navigator.of(context).pushNamed("/manage-products");
+          },
+          icon: const Icon(Icons.list_sharp))
   ];
+}
+
+Future<List<String>> getRoles() async {
+  SharedPreferences pref = await SharedPreferences.getInstance();
+  List<String> roles = pref.getStringList("roles") ?? [];
+  debugPrint(roles.toString());
+  return roles;
+}
+
+Future<bool> setRoles(List<String> roles) async {
+  SharedPreferences pref = await SharedPreferences.getInstance();
+  return await pref.setStringList("roles", roles);
 }

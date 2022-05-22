@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:order/components/AppDrawer.dart';
+import 'package:order/pages/AdminItemManage.dart';
+import 'package:order/pages/AdminOrderDetail.dart';
+import 'package:order/pages/AdminOrderList.dart';
 import 'package:order/pages/LoginPage.dart';
 import 'package:order/pages/OrderCreate.dart';
 import 'package:order/pages/OrderDetails.dart';
@@ -9,9 +13,11 @@ import 'package:provider/provider.dart';
 import 'package:order/globals.dart' as globals;
 
 void main() {
-  runApp(MultiProvider(
-      providers: [Provider(create: (context) => ApiClient())],
-      child: const MyApp()));
+  runApp(MultiProvider(providers: [
+    Provider(create: (context) => ApiClient()),
+    ChangeNotifierProvider<DrawerStateInfo>(
+        create: (context) => DrawerStateInfo()),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -61,10 +67,15 @@ class MyApp extends StatelessWidget {
         },
       ),
       routes: <String, WidgetBuilder>{
-        '/signup': (BuildContext context) => const SignUpPage(),
-        '/orders': (BuildContext context) => const OrderHistory(),
-        '/order-details': (BuildContext context) => const OrderDetails(),
+        '/login': (BuildContext context) => const LoginPage(),
+        '/sign-up': (BuildContext context) => const SignUpPage(),
+        '/order-list': (BuildContext context) => const OrderHistory(),
+        '/order-detail': (BuildContext context) => const OrderDetails(),
         '/order-create': (BuildContext context) => const OrderCreate(),
+        '/manage-products': (BuildContext context) => const AdminItemManage(),
+        '/manage-orders': (BuildContext context) => const AdminOrderList(),
+        "/manage-order-detail": (BuildContext context) =>
+            const AdminOrderDetails(),
       },
     );
   }

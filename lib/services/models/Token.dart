@@ -3,13 +3,16 @@ part 'Token.g.dart';
 
 @JsonSerializable()
 class Token {
-  final int user_id;
+  @JsonKey(name: "user_id")
+  final int userId;
   final String token;
   final String email;
+  final List<String> roles;
 
-  const Token({
+  const Token(
+    this.roles, {
     required this.email,
-    required this.user_id,
+    required this.userId,
     required this.token,
   });
 

@@ -91,7 +91,7 @@ class _LoginState extends State<LoginPage> {
                     child: ElevatedButton(
                         child: const Text("Signup"),
                         onPressed: () {
-                          Navigator.pushNamed(context, "/signup");
+                          Navigator.pushNamed(context, "/sign-up");
                         }))
               ])),
         ))));
@@ -106,15 +106,22 @@ class _LoginState extends State<LoginPage> {
     });
     globals.apiClient
         .getToken(_usernameController.text, _passwordController.text)
-        .then((token) {
-      globals.secureStorage
-          .write(value: token.token, key: 'token')
-          .then((value) {
-        setState(() {
-          loading = false;
-        });
-        Navigator.popAndPushNamed(context, "/orders");
+        .then((token) async {
+      await Future.wait([
+        globals.setRoles(token.roles).then((value) {
+          debugPrint("role writing : $value");
+        }),
+        globals.secureStorage.write(value: token.token, key: 'token').then(
+            (value) {
+          debugPrint("token written successfully");
+        }, onError: (value) {
+          debugPrint("failed to write token");
+        })
+      ]);
+      setState(() {
+        loading = false;
       });
+      Navigator.popAndPushNamed(context, "/order-list");
     }).catchError((ex) {
       Map? response = globals.getErrorResponse(ex);
 

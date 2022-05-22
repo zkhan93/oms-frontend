@@ -7,18 +7,22 @@ part 'OrderDetail.g.dart';
 class OrderDetail {
   final int id;
   final Customer customer;
-  final String created_on;
+  @JsonKey(name: "created_on")
+  final String createdOn;
   final String? comment;
   final String state;
   final List<OrderItem> items;
+  final String? total;
 
-  const OrderDetail(
-      {required this.id,
-      required this.customer,
-      required this.created_on,
-      required this.comment,
-      required this.state,
-      required this.items});
+  const OrderDetail({
+    required this.id,
+    required this.customer,
+    required this.createdOn,
+    required this.comment,
+    required this.state,
+    required this.items,
+    required this.total,
+  });
 
   factory OrderDetail.fromJson(Map<String, dynamic> json) =>
       _$OrderDetailFromJson(json);

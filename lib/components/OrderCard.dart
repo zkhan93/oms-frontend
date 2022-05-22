@@ -22,7 +22,7 @@ var OrderCard = Consumer<OrdersModel>(
               title: Text("Order #" + order.id.toString()),
               isThreeLine: true,
               onTap: () {
-                Navigator.pushNamed(context, "/order-details",
+                Navigator.pushNamed(context, "/order-detail",
                     arguments: OrderDetailArguments(order.id));
               },
               contentPadding: const EdgeInsets.all(8),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:order/components/AppDrawer.dart';
 import 'package:order/components/LabelRow.dart';
 import 'package:order/globals.dart' as globals;
 import 'package:order/services/ApiClient.dart';
@@ -25,21 +24,21 @@ OrderDetail _dummyOrder = const OrderDetail(
     total: null,
     state: "");
 
-class OrderDetailArguments {
+class AdminOrderDetailArguments {
   final int orderId;
-  OrderDetailArguments(this.orderId);
+  AdminOrderDetailArguments(this.orderId);
 }
 
-class OrderDetails extends StatefulWidget {
-  const OrderDetails({Key? key}) : super(key: key);
+class AdminOrderDetails extends StatefulWidget {
+  const AdminOrderDetails({Key? key}) : super(key: key);
 
   @override
-  State<OrderDetails> createState() => _OrderDetailsState();
+  State<AdminOrderDetails> createState() => _AdminOrderDetailsState();
 }
 
-class OrderItemsWidget extends StatelessWidget {
+class AdminOrderItemsWidget extends StatelessWidget {
   final List<OrderItem> items;
-  const OrderItemsWidget({
+  const AdminOrderItemsWidget({
     Key? key,
     required this.items,
   }) : super(key: key);
@@ -51,44 +50,81 @@ class OrderItemsWidget extends StatelessWidget {
       itemCount: items.isEmpty ? 1 : items.length,
       itemBuilder: (context, index) {
         if (items.isEmpty) return const Text("No Items");
-        return OrderItemWidget(item: items[index]);
+        return AdminOrderItemWidget(item: items[index]);
       },
     );
   }
 }
 
-class OrderItemWidget extends StatelessWidget {
+class AdminOrderItemWidget extends StatefulWidget {
   final OrderItem item;
 
-  const OrderItemWidget({
+  const AdminOrderItemWidget({
     Key? key,
     required this.item,
   }) : super(key: key);
 
   @override
+  State<AdminOrderItemWidget> createState() => _AdminOrderItemWidgetState();
+}
+
+class SetOrderItemPriceDialog extends StatelessWidget {
+  final OrderItem item;
+  final Function(OrderItem item) callback;
+
+  const SetOrderItemPriceDialog({
+    Key? key,
+    required this.item,
+    required this.callback,
+  }) : super(key: key);
+
+  @override
   Widget build(BuildContext context) {
-    String price = "";
-    if (item.price != null) {
-      price = "${globals.rs} ${item.price}";
-    }
-    return ListTile(
-      dense: true,
-      title: Text(
-        item.name,
-        textAlign: TextAlign.start,
-      ),
-      subtitle: item.price != null ? Text("${globals.rs} ${item.price}") : null,
-      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-        Text("${item.quantity} ${item.unit}"),
-        if (price.isNotEmpty)
-          Padding(
-              padding: const EdgeInsets.only(left: 32.0), child: Text(price)),
-      ]),
-    );
+    TextEditingController _priceController =
+        TextEditingController(text: item.price);
+    return AlertDialog(
+        title: const Text("Set Price"),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              item.name,
+              textAlign: TextAlign.start,
+            ),
+            TextFormField(
+              controller: _priceController,
+              decoration: const InputDecoration(label: Text("Price")),
+            )
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              debugPrint("from cancel");
+              callback(item);
+            },
+            child: const Text("Cancel"),
+            style: TextButton.styleFrom(primary: Colors.red),
+          ),
+          TextButton(
+              onPressed: () {
+                globals.apiClient.updateOrderItem(
+                    item.id, {"price": _priceController.text}).then(
+                  (value) {
+                    Navigator.of(context).pop();
+                    debugPrint("from set");
+                    callback(value);
+                  },
+                );
+              },
+              child: const Text("Set"))
+        ]);
   }
 }
 
-class _OrderDetailsState extends State<OrderDetails> {
+class _AdminOrderDetailsState extends State<AdminOrderDetails> {
   late Future<OrderDetail> _order;
   late int orderId;
 
@@ -127,7 +163,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     label: "Order Total",
                     value: order.total != null
                         ? "${globals.rs} ${order.total}"
-                        : "Price not set for items"),
+                        : "Price not set for one or more items"),
               ]),
             ),
           ),
@@ -144,7 +180,7 @@ class _OrderDetailsState extends State<OrderDetails> {
           ),
           Flexible(
             child: Card(
-                child: OrderItemsWidget(
+                child: AdminOrderItemsWidget(
               items: order.items,
             )),
             fit: FlexFit.loose,
@@ -177,7 +213,19 @@ class _OrderDetailsState extends State<OrderDetails> {
                           _order = _cancelOrder(orderId);
                         });
                       },
-                      child: const Text("CANCEL ORDER"))
+                      child: const Text("CANCEL ORDER")),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(8),
+                        primary: Theme.of(context).primaryColor,
+                        minimumSize: const Size.fromHeight(40)),
+                    onPressed: () {
+                      setState(() {
+                        // update order to change the state to being processed
+                        // _order = _updateOrder(orderId);
+                      });
+                    },
+                    child: const Text("UPDATE ORDER"))
               ]))
         ]);
       },
@@ -192,8 +240,8 @@ class _OrderDetailsState extends State<OrderDetails> {
 
   @override
   void didChangeDependencies() {
-    final OrderDetailArguments args =
-        ModalRoute.of(context)!.settings.arguments as OrderDetailArguments;
+    final AdminOrderDetailArguments args =
+        ModalRoute.of(context)!.settings.arguments as AdminOrderDetailArguments;
     orderId = args.orderId;
     _order = _loadOrder(orderId);
     super.didChangeDependencies();
@@ -212,5 +260,38 @@ class _OrderDetailsState extends State<OrderDetails> {
       debugPrint(error.toString());
       return _dummyOrder;
     });
+  }
+}
+
+class _AdminOrderItemWidgetState extends State<AdminOrderItemWidget> {
+  @override
+  Widget build(BuildContext context) {
+    String price = "";
+    if (widget.item.price != null) {
+      price = "${globals.rs} ${widget.item.price}";
+    }
+    return ListTile(
+      onTap: () {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return SetOrderItemPriceDialog(
+                  item: widget.item,
+                  callback: (updatedItem) {
+                    setState(() {
+                      widget.item.price = updatedItem.price;
+                    });
+                    debugPrint(updatedItem.toJson().toString());
+                  });
+            });
+      },
+      dense: true,
+      title: Text(
+        widget.item.name,
+        textAlign: TextAlign.start,
+      ),
+      subtitle: Text("${widget.item.quantity} ${widget.item.unit}"),
+      trailing: price.isEmpty ? const Text("-NOT SET-") : Text(price),
+    );
   }
 }

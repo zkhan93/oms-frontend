@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:order/services/models/Item.dart';
+import 'package:order/services/models/ItemsResponse.dart';
 import 'package:order/services/models/OrderDetail.dart';
+import 'package:order/services/models/OrderItem.dart';
 import 'package:order/services/models/Token.dart';
 import 'package:order/services/models/OrderResponse.dart';
 import 'package:retrofit/retrofit.dart';
@@ -47,6 +50,17 @@ abstract class ApiClient {
   @PATCH("/order/{id}/")
   Future<OrderDetail> updateOrder(
       @Path("id") int orderId, @Body() Map<String, dynamic> data);
+
+  @GET("/item/")
+  Future<ItemsResponse> getItems();
+
+  @PATCH("/item/{id}/")
+  Future<Item> updateItem(
+      @Path("id") int itemId, @Body() Map<String, dynamic> data);
+
+  @PATCH("/orderitem/{id}/")
+  Future<OrderItem> updateOrderItem(
+      @Path("id") int orderItemId, @Body() Map<String, dynamic> data);
 
   @GET("/comments?postId={id}")
   Future<Token> getCommentFromPostId(@Path("id") int postId);

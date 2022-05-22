@@ -11,13 +11,14 @@ class Order {
   final String state;
   final int item_count;
 
-  const Order(
-      {required this.id,
-      required this.customer,
-      required this.created_on,
-      required this.comment,
-      required this.state,
-      required this.item_count});
+  const Order({
+    required this.id,
+    required this.customer,
+    required this.created_on,
+    required this.comment,
+    required this.state,
+    required this.item_count,
+  });
 
   factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
   Map<String, dynamic> toJson() => _$OrderToJson(this);

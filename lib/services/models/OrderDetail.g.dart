@@ -9,20 +9,22 @@ part of 'OrderDetail.dart';
 OrderDetail _$OrderDetailFromJson(Map<String, dynamic> json) => OrderDetail(
       id: json['id'] as int,
       customer: Customer.fromJson(json['customer'] as Map<String, dynamic>),
-      created_on: json['created_on'] as String,
+      createdOn: json['created_on'] as String,
       comment: json['comment'] as String?,
       state: json['state'] as String,
       items: (json['items'] as List<dynamic>)
           .map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
           .toList(),
+      total: json['total'] as String?,
     );
 
 Map<String, dynamic> _$OrderDetailToJson(OrderDetail instance) =>
     <String, dynamic>{
       'id': instance.id,
       'customer': instance.customer.toJson(),
-      'created_on': instance.created_on,
+      'created_on': instance.createdOn,
       'comment': instance.comment,
       'state': instance.state,
       'items': instance.items.map((e) => e.toJson()).toList(),
+      'total': instance.total,
     };

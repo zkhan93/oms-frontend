@@ -128,7 +128,7 @@ class _OrderCreateState extends State<OrderCreate> {
                             _createOrder();
                           },
                           child: const Text(
-                            "CREATE",
+                            "CREATE ORDER",
                           ),
                         ),
                         TextButton(
@@ -152,9 +152,9 @@ class _OrderCreateState extends State<OrderCreate> {
         ));
     return Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(
-          title: const Text("Create New Order"),
-        ),
+        appBar: AppBar(title: const Text("Create New Order"), actions: [
+          // ...globals.getDefaultActions(context),
+        ]),
         body: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Flexible(
               fit: FlexFit.tight,
@@ -180,20 +180,30 @@ class _OrderCreateState extends State<OrderCreate> {
   _buildItem(context, index, animation) {
     Map item = items[index];
     var entryItem = ListTile(
-      onTap: () {
-        setState(() {
-          updateIndex = index;
-          currentItem = Map.from(items[index]);
-        });
-      },
-      trailing: IconButton(
-          color: Colors.red,
-          splashColor: Colors.red[300],
-          onPressed: () {
-            Future.delayed(
-                const Duration(milliseconds: 200), (() => _removeItem(index)));
-          },
-          icon: const Icon(Icons.remove)),
+      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+        IconButton(
+            tooltip: "Edit",
+            color: Colors.grey,
+            onPressed: () {
+              Future.delayed(const Duration(milliseconds: 200), (() {
+                setState(() {
+                  updateIndex = index;
+                  currentItem = Map.from(items[index]);
+                });
+              }));
+            },
+            icon: const Icon(Icons.edit)),
+        Flexible(
+            child: IconButton(
+                tooltip: "Remove",
+                color: Colors.red,
+                splashColor: Colors.red[300],
+                onPressed: () {
+                  Future.delayed(const Duration(milliseconds: 200),
+                      (() => _removeItem(index)));
+                },
+                icon: const Icon(Icons.remove)))
+      ]),
       title: Text(item["name"]),
       subtitle: Text("${item['quantity']} ${item['unit']}"),
     );
@@ -224,7 +234,7 @@ class _OrderCreateState extends State<OrderCreate> {
       //   loading = false;
       // });
       Navigator.pop(context);
-      Navigator.popAndPushNamed(context, "/orders",
+      Navigator.popAndPushNamed(context, "/order-list",
           arguments: OrdersPageArguments("Order created successfully"));
     }).catchError((error) {
       debugPrint("error occurred!");
@@ -243,6 +253,16 @@ class _OrderCreateState extends State<OrderCreate> {
         duration: const Duration(milliseconds: 300));
     setState(() {
       items.removeAt(index);
+      if (updateIndex != -1) {
+        if (index < updateIndex) {
+          // an item above editing item was removed
+          updateIndex -= 1;
+        } else if (index == updateIndex) {
+          // editing item was deleted
+          updateIndex = -1;
+          currentItem = Map.from(emptyItem);
+        }
+      }
     });
   }
 }
