@@ -8,13 +8,11 @@ import 'package:order/pages/OrderCreate.dart';
 import 'package:order/pages/OrderDetails.dart';
 import 'package:order/pages/OrderHistory.dart';
 import 'package:order/pages/SignupPage.dart';
-import 'package:order/services/ApiClient.dart';
 import 'package:provider/provider.dart';
 import 'package:order/globals.dart' as globals;
 
 void main() {
   runApp(MultiProvider(providers: [
-    Provider(create: (context) => ApiClient()),
     ChangeNotifierProvider<DrawerStateInfo>(
         create: (context) => DrawerStateInfo()),
   ], child: const MyApp()));

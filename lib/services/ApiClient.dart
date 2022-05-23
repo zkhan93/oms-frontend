@@ -1,3 +1,6 @@
+import 'dart:ffi';
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,21 +18,20 @@ const secureStorage = FlutterSecureStorage();
 @RestApi(baseUrl: "http://192.168.1.56:8081/")
 // @RestApi(baseUrl: "http://10.0.2.2:8081/")
 abstract class ApiClient {
-  factory ApiClient({String? baseUrl}) {
-    Dio dio = Dio();
-    dio.options = BaseOptions(receiveTimeout: 5000, connectTimeout: 5000);
-    dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
-      secureStorage.read(key: "token").then((token) {
-        if (token != null && token.isNotEmpty) {
-          options.headers["authorization"] = "Token $token";
-        }
-        handler.next(options);
-      }, onError: (error) {
-        debugPrint(error.toString());
-        debugPrint("Error Fetching Token");
-        handler.next(options);
-      });
-    }));
+  factory ApiClient(Dio dio, {String? baseUrl}) {
+    // dio.options = BaseOptions(receiveTimeout: 5000, connectTimeout: 5000);
+    // dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+    //   secureStorage.read(key: "token").then((token) {
+    //     if (token != null && token.isNotEmpty) {
+    //       options.headers["authorization"] = "Token $token";
+    //     }
+    //     handler.next(options);
+    //   }, onError: (error) {
+    //     debugPrint(error.toString());
+    //     debugPrint("Error Fetching Token");
+    //     handler.next(options);
+    //   });
+    // }));
     return _ApiClient(dio, baseUrl: baseUrl);
   }
 
@@ -62,6 +64,7 @@ abstract class ApiClient {
   Future<OrderItem> updateOrderItem(
       @Path("id") int orderItemId, @Body() Map<String, dynamic> data);
 
-  @GET("/comments?postId={id}")
-  Future<Token> getCommentFromPostId(@Path("id") int postId);
+  @GET("/order/{id}/receipt")
+  @DioResponseType(ResponseType.bytes)
+  Future<HttpResponse> getReceipt(@Path("id") int orderId);
 }

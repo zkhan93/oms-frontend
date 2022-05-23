@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:order/components/AppDrawer.dart';
 import 'package:order/components/LabelRow.dart';
 import 'package:order/globals.dart' as globals;
-import 'package:order/services/ApiClient.dart';
+import 'package:order/utils.dart' as utils;
 import 'package:order/services/models/Customer.dart';
 import 'package:order/services/models/OrderDetail.dart';
 import 'package:order/services/models/OrderItem.dart';
@@ -91,6 +90,7 @@ class OrderItemWidget extends StatelessWidget {
 class _OrderDetailsState extends State<OrderDetails> {
   late Future<OrderDetail> _order;
   late int orderId;
+  bool _downloading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -152,18 +152,35 @@ class _OrderDetailsState extends State<OrderDetails> {
           Container(
               padding: const EdgeInsets.only(top: 16.0),
               child: Column(children: [
+                // if (order.state.isNotEmpty &&
+                //     order.state.toLowerCase() == "delivered")
                 if (order.state.isNotEmpty &&
-                    order.state.toLowerCase() == "delivered")
+                    ((["delivered", "processing"]
+                        .contains(order.state.toLowerCase()))))
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(8),
-                          minimumSize: const Size.fromHeight(40)),
-                      onPressed: () {
+                          minimumSize: const Size.fromHeight(40),
+                          fixedSize: const Size.fromHeight(40)),
+                      onPressed: () async {
                         setState(() {
-                          _order = _cancelOrder(orderId);
+                          _downloading = true;
+                        });
+                        await utils.downloadReceipt(orderId);
+                        setState(() {
+                          _downloading = false;
                         });
                       },
-                      child: const Text("DOWNLOAD RECEIPT")),
+                      child: _downloading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                                semanticsLabel: "Downloading Order receipt",
+                              ))
+                          : const Text("DOWNLOAD RECEIPT")),
                 if (order.state.isNotEmpty &&
                     (!(["delivered", "cancelled"]
                         .contains(order.state.toLowerCase()))))
@@ -208,7 +225,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   }
 
   Future<OrderDetail> _loadOrder(int id) {
-    return ApiClient().getOrder(id).catchError((error) {
+    return globals.apiClient.getOrder(id).catchError((error) {
       debugPrint(error.toString());
       return _dummyOrder;
     });

@@ -152,19 +152,23 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<Token> getCommentFromPostId(postId) async {
+  Future<HttpResponse<dynamic>> getReceipt(orderId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<Token>(
-            Options(method: 'GET', headers: _headers, extra: _extra)
-                .compose(_dio.options, '/comments?postId=${postId}',
-                    queryParameters: queryParameters, data: _data)
-                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Token.fromJson(_result.data!);
-    return value;
+    final _result = await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(
+        Options(
+                method: 'GET',
+                headers: _headers,
+                extra: _extra,
+                responseType: ResponseType.bytes)
+            .compose(_dio.options, '/order/${orderId}/receipt',
+                queryParameters: queryParameters, data: _data)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

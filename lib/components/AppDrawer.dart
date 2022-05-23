@@ -3,7 +3,7 @@ import 'package:order/globals.dart' as globals;
 import 'package:provider/provider.dart';
 
 class DrawerStateInfo with ChangeNotifier {
-  int _currentItemIndex = 0;
+  int _currentItemIndex = AppDrawerEntry.ORDERS;
   int get getCurrentItemIndex => _currentItemIndex;
 
   void setSelected(int itemIndex) {

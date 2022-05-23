@@ -39,7 +39,9 @@ class OrderItemWidget extends StatelessWidget {
         }));
       },
       contentPadding: const EdgeInsets.all(8),
-      subtitle: Text(createdOn),
+      subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [Text(createdOn), Text("Status: ${order.state}")]),
     );
   }
 }
@@ -57,16 +59,11 @@ class OrdersPageArguments {
 
 class _OrderHistoryState extends State<OrderHistory> {
   late String? message;
-  // List<Widget> actions = [];
 
   @override
   void initState() {
     super.initState();
-    // globals.getDefaultActions(context).then((value) {
-    //   setState(() {
-    //     actions = value;
-    //   });
-    // });
+
     WidgetsBinding.instance.addPostFrameCallback((_) => showMessage());
   }
 
@@ -89,9 +86,7 @@ class _OrderHistoryState extends State<OrderHistory> {
               OrderResponse response = await globals.apiClient.getOrders();
               return OrdersModel(orders: response.results);
             },
-            child: Consumer<OrdersModel>(
-                //                    <--- Consumer
-                builder: (context, orderModel, child) {
+            child: Consumer<OrdersModel>(builder: (context, orderModel, child) {
               if (orderModel.error.isNotEmpty) {
                 return Center(
                     widthFactor: 1,

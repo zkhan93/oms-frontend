@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
 import 'package:order/components/LabelRow.dart';
 import 'package:order/globals.dart' as globals;
+import 'package:order/utils.dart' as utils;
 import 'package:order/services/ApiClient.dart';
 import 'package:order/services/models/Customer.dart';
 import 'package:order/services/models/OrderDetail.dart';
 import 'package:order/services/models/OrderItem.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 OrderDetail _dummyOrder = const OrderDetail(
     comment: "",
@@ -127,6 +134,7 @@ class SetOrderItemPriceDialog extends StatelessWidget {
 class _AdminOrderDetailsState extends State<AdminOrderDetails> {
   late Future<OrderDetail> _order;
   late int orderId;
+  bool _downloading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -164,6 +172,8 @@ class _AdminOrderDetailsState extends State<AdminOrderDetails> {
                     value: order.total != null
                         ? "${globals.rs} ${order.total}"
                         : "Price not set for one or more items"),
+                if (order.comment != null && order.comment!.isNotEmpty)
+                  LabelRow(label: "Comment", value: order.comment ?? ""),
               ]),
             ),
           ),
@@ -189,17 +199,57 @@ class _AdminOrderDetailsState extends State<AdminOrderDetails> {
               padding: const EdgeInsets.only(top: 16.0),
               child: Column(children: [
                 if (order.state.isNotEmpty &&
-                    order.state.toLowerCase() == "delivered")
+                    ((["delivered", "processing"]
+                        .contains(order.state.toLowerCase()))))
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(8),
                           minimumSize: const Size.fromHeight(40)),
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
-                          _order = _cancelOrder(orderId);
+                          _downloading = true;
+                        });
+                        await utils.downloadReceipt(orderId);
+                        setState(() {
+                          _downloading = false;
                         });
                       },
-                      child: const Text("DOWNLOAD RECEIPT")),
+                      child: _downloading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                                semanticsLabel: "Downloading Order receipt",
+                              ))
+                          : const Text("DOWNLOAD RECEIPT")),
+                if (order.state.isNotEmpty &&
+                    ((["processing"].contains(order.state.toLowerCase()))))
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(8),
+                          primary: Theme.of(context).primaryColor,
+                          minimumSize: const Size.fromHeight(40)),
+                      onPressed: () {
+                        setState(() {
+                          _order = _updateOrder(orderId, "D");
+                        });
+                      },
+                      child: const Text("ORDER DELIVERED")),
+                if (order.state.isNotEmpty &&
+                    ((["created"].contains(order.state.toLowerCase()))))
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(8),
+                          primary: Theme.of(context).primaryColor,
+                          minimumSize: const Size.fromHeight(40)),
+                      onPressed: () {
+                        setState(() {
+                          _order = _updateOrder(orderId, "P");
+                        });
+                      },
+                      child: const Text("PROCESS ORDER")),
                 if (order.state.isNotEmpty &&
                     (!(["delivered", "cancelled"]
                         .contains(order.state.toLowerCase()))))
@@ -210,22 +260,11 @@ class _AdminOrderDetailsState extends State<AdminOrderDetails> {
                           minimumSize: const Size.fromHeight(40)),
                       onPressed: () {
                         setState(() {
-                          _order = _cancelOrder(orderId);
+                          // TODO: show dioalog to capture reason for cancellation
+                          _order = _updateOrder(orderId, "X");
                         });
                       },
                       child: const Text("CANCEL ORDER")),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(8),
-                        primary: Theme.of(context).primaryColor,
-                        minimumSize: const Size.fromHeight(40)),
-                    onPressed: () {
-                      setState(() {
-                        // update order to change the state to being processed
-                        // _order = _updateOrder(orderId);
-                      });
-                    },
-                    child: const Text("UPDATE ORDER"))
               ]))
         ]);
       },
@@ -247,16 +286,16 @@ class _AdminOrderDetailsState extends State<AdminOrderDetails> {
     super.didChangeDependencies();
   }
 
-  Future<OrderDetail> _cancelOrder(int id) {
+  Future<OrderDetail> _updateOrder(int id, String state) {
     return globals.apiClient
-        .updateOrder(id, {"state": "X"}).catchError((error) {
+        .updateOrder(id, {"state": state}).catchError((error) {
       debugPrint(error.toString());
       return _dummyOrder;
     });
   }
 
   Future<OrderDetail> _loadOrder(int id) {
-    return ApiClient().getOrder(id).catchError((error) {
+    return globals.apiClient.getOrder(id).catchError((error) {
       debugPrint(error.toString());
       return _dummyOrder;
     });

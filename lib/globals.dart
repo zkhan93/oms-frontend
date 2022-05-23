@@ -1,12 +1,29 @@
-import 'dart:ffi';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:order/services/ApiClient.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-ApiClient apiClient = ApiClient();
+Dio getDio() {
+  Dio dio = Dio();
+  dio.options = BaseOptions(receiveTimeout: 5000, connectTimeout: 5000);
+  dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+    secureStorage.read(key: "token").then((token) {
+      if (token != null && token.isNotEmpty) {
+        options.headers["authorization"] = "Token $token";
+      }
+      handler.next(options);
+    }, onError: (error) {
+      debugPrint(error.toString());
+      debugPrint("Error Fetching Token");
+      handler.next(options);
+    });
+  }));
+  return dio;
+}
+
+Dio dio = getDio();
+ApiClient apiClient = ApiClient(dio);
 const secureStorage = FlutterSecureStorage();
 
 const rs = "₹";
