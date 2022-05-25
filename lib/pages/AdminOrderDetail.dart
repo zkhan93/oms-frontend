@@ -1,18 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:open_file/open_file.dart';
 import 'package:order/components/LabelRow.dart';
 import 'package:order/globals.dart' as globals;
 import 'package:order/utils.dart' as utils;
-import 'package:order/services/ApiClient.dart';
 import 'package:order/services/models/Customer.dart';
 import 'package:order/services/models/OrderDetail.dart';
 import 'package:order/services/models/OrderItem.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 OrderDetail _dummyOrder = const OrderDetail(
     comment: "",
@@ -20,7 +13,6 @@ OrderDetail _dummyOrder = const OrderDetail(
     id: 0,
     customer: Customer(
       id: 1,
-      name: "",
       username: "",
       user: 1,
       contact: "",

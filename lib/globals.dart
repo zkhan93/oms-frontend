@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:order/services/ApiClient.dart';
+import 'package:order/services/models/Customer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Dio getDio() {
@@ -30,6 +33,7 @@ const rs = "₹";
 
 String getErrorMsg(ex) {
   if (ex.type == DioErrorType.response) {
+    debugPrint(ex.response.toString());
     return 'No Response from the server';
   }
   if (ex.type == DioErrorType.connectTimeout) {
@@ -63,25 +67,24 @@ Map? getErrorResponse(ex) {
   return response;
 }
 
-Future<List<Widget>> getDefaultActions(context) async {
-  List<String> roles = await getRoles();
-  return <Widget>[
-    IconButton(
-        onPressed: () async {
-          if (await secureStorage.containsKey(key: "token")) {
-            await secureStorage.delete(key: "token");
-          }
-          Navigator.of(context).pushNamedAndRemoveUntil(
-              "/login", (Route<dynamic> route) => false);
-        },
-        icon: const Icon(Icons.logout)),
-    if (roles.contains("admin"))
-      IconButton(
-          onPressed: () {
-            Navigator.of(context).pushNamed("/manage-products");
-          },
-          icon: const Icon(Icons.list_sharp))
-  ];
+Future<Customer?> fetchUserDetails(int customerId) async {
+  Customer? customer;
+  try {
+    customer = await apiClient.getCustomer(customerId);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setString("user", json.encode(customer.toJson()));
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+  return customer;
+}
+
+Future<Customer?> getUser() async {
+  SharedPreferences pref = await SharedPreferences.getInstance();
+  String? jsonCustomer = await pref.getString("user");
+  if (jsonCustomer != null && jsonCustomer.isNotEmpty) {
+    return Customer.fromJson(json.decode(jsonCustomer));
+  }
 }
 
 Future<List<String>> getRoles() async {

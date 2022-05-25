@@ -35,14 +35,24 @@ class AppDrawer extends StatefulWidget {
 
 class _AppDrawerState extends State<AppDrawer> {
   bool _showAdminActions = false;
+  List<String> roles = [];
+  String name = "";
 
   @override
   void initState() {
     super.initState();
     globals.getRoles().then((value) {
-      if (value.contains("admin")) {
-        setState(() {
+      setState(() {
+        roles = value;
+        if (value.contains("admin")) {
           _showAdminActions = true;
+        }
+      });
+    });
+    globals.getUser().then((customer) {
+      if (customer != null) {
+        setState(() {
+          name = customer.supervisor;
         });
       }
     });
@@ -64,6 +74,8 @@ class _AppDrawerState extends State<AppDrawer> {
       }
       Navigator.of(context)
           .pushNamedAndRemoveUntil("/login", (Route<dynamic> route) => false);
+      Provider.of<DrawerStateInfo>(context, listen: false)
+          .setSelected(AppDrawerEntry.ORDERS);
     }
   }
 
@@ -107,9 +119,10 @@ class _AppDrawerState extends State<AppDrawer> {
               Icons.account_circle_outlined,
               size: 48,
             ),
-            title: Text("Zeeshan Khan",
-                style: Theme.of(context).textTheme.headline6),
-            subtitle: const Text("Admin"),
+            title: Text(name, style: Theme.of(context).textTheme.headline6),
+            subtitle: roles.contains("admin")
+                ? const Text("Admin")
+                : const Text("Customer"),
           ),
         ),
         ListTile(

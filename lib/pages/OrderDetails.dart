@@ -13,7 +13,6 @@ OrderDetail _dummyOrder = const OrderDetail(
     id: 0,
     customer: Customer(
       id: 1,
-      name: "",
       username: "",
       user: 1,
       contact: "",
@@ -66,9 +65,9 @@ class OrderItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String price = "";
+    String amount = "";
     if (item.price != null) {
-      price = "${globals.rs} ${item.price}";
+      amount = "${globals.rs} ${double.parse(item.price!) * item.quantity}";
     }
     return ListTile(
       dense: true,
@@ -79,9 +78,9 @@ class OrderItemWidget extends StatelessWidget {
       subtitle: item.price != null ? Text("${globals.rs} ${item.price}") : null,
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         Text("${item.quantity} ${item.unit}"),
-        if (price.isNotEmpty)
+        if (amount.isNotEmpty)
           Padding(
-              padding: const EdgeInsets.only(left: 32.0), child: Text(price)),
+              padding: const EdgeInsets.only(left: 32.0), child: Text(amount)),
       ]),
     );
   }

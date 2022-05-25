@@ -25,8 +25,15 @@ class _AdminOrderListState extends State<AdminOrderList> {
         body: FutureProvider<OrdersModel>(
             initialData: OrdersModel(),
             create: (context) async {
-              OrderResponse response = await globals.apiClient.getOrders();
-              return OrdersModel(orders: response.results);
+              // TODO: handle paginated response
+              try {
+                OrderResponse response = await globals.apiClient.getAllOrders();
+                return OrdersModel(orders: response.results);
+              } catch (ex) {
+                debugPrint("here");
+                debugPrint(ex.toString());
+              }
+              return OrdersModel(orders: []);
             },
             child: Consumer<OrdersModel>(
                 //                    <--- Consumer

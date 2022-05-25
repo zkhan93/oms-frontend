@@ -1,9 +1,6 @@
-import 'dart:ffi';
-import 'dart:typed_data';
-
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:order/services/models/Customer.dart';
 import 'package:order/services/models/Item.dart';
 import 'package:order/services/models/ItemsResponse.dart';
 import 'package:order/services/models/OrderDetail.dart';
@@ -15,23 +12,10 @@ part 'ApiClient.g.dart';
 
 const secureStorage = FlutterSecureStorage();
 
-@RestApi(baseUrl: "http://192.168.1.56:8081/")
-// @RestApi(baseUrl: "http://10.0.2.2:8081/")
+// @RestApi(baseUrl: "http://192.168.1.56:8081/")
+@RestApi(baseUrl: "https://oms.khancave.in/")
 abstract class ApiClient {
   factory ApiClient(Dio dio, {String? baseUrl}) {
-    // dio.options = BaseOptions(receiveTimeout: 5000, connectTimeout: 5000);
-    // dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
-    //   secureStorage.read(key: "token").then((token) {
-    //     if (token != null && token.isNotEmpty) {
-    //       options.headers["authorization"] = "Token $token";
-    //     }
-    //     handler.next(options);
-    //   }, onError: (error) {
-    //     debugPrint(error.toString());
-    //     debugPrint("Error Fetching Token");
-    //     handler.next(options);
-    //   });
-    // }));
     return _ApiClient(dio, baseUrl: baseUrl);
   }
 
@@ -40,8 +24,17 @@ abstract class ApiClient {
   Future<Token> getToken(
       @Field('username') String username, @Field('password') String password);
 
+  @POST("/customer/")
+  Future<Customer> register(@Body() Map<String, dynamic> data);
+
+  @GET("/customer/{id}/")
+  Future<Customer> getCustomer(@Path("id") int customerId);
+
   @GET("/order/")
   Future<OrderResponse> getOrders();
+
+  @GET("/order/all/")
+  Future<OrderResponse> getAllOrders();
 
   @POST("/order/")
   Future<OrderDetail> createOrder(@Body() Map<String, dynamic> data);

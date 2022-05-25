@@ -106,9 +106,21 @@ class _OrderCreateState extends State<OrderCreate> {
                       value: currentItem["unit"],
                       items: const <DropdownMenuItem<String>>[
                         DropdownMenuItem(
-                          child: Text("Kg"),
+                          child: Text("Kilogram"),
                           value: "kg",
-                        )
+                        ),
+                        DropdownMenuItem(
+                          child: Text("Grams"),
+                          value: "g",
+                        ),
+                        DropdownMenuItem(
+                          child: Text("Liters"),
+                          value: "lts",
+                        ),
+                        DropdownMenuItem(
+                          child: Text("No.s"),
+                          value: "number",
+                        ),
                       ],
                       onChanged: (value) {
                         currentItem["unit"] = value;
@@ -152,9 +164,7 @@ class _OrderCreateState extends State<OrderCreate> {
         ));
     return Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: const Text("Create New Order"), actions: [
-          // ...globals.getDefaultActions(context),
-        ]),
+        appBar: AppBar(title: const Text("Create New Order")),
         body: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Flexible(
               fit: FlexFit.tight,

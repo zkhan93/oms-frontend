@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:order/components/ErrorMsg.dart';
 import 'package:order/components/Loading.dart';
 import 'package:order/globals.dart' as globals;
+import 'package:order/services/models/Token.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -38,11 +39,11 @@ class _LoginState extends State<LoginPage> {
                   controller: _usernameController,
                   decoration: const InputDecoration(
                     icon: Icon(Icons.person),
-                    labelText: 'Username',
+                    labelText: 'Contact Number',
                   ),
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter username';
+                      return 'Please enter contact number';
                     }
                     if (usernameErrors.isNotEmpty) {
                       return usernameErrors.join("\n");
@@ -106,8 +107,10 @@ class _LoginState extends State<LoginPage> {
     });
     globals.apiClient
         .getToken(_usernameController.text, _passwordController.text)
-        .then((token) async {
+        .then((Token token) async {
       await Future.wait([
+        if (token.customerId != null)
+          globals.fetchUserDetails(token.customerId!),
         globals.setRoles(token.roles).then((value) {
           debugPrint("role writing : $value");
         }),

@@ -104,6 +104,7 @@ class _AdminItemManageState extends State<AdminItemManage> {
   }
 
   Future<ItemsResponse> _loadItems() {
+    // TODO: handle paginated response
     return globals.apiClient.getItems();
   }
 }

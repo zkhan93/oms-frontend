@@ -6,14 +6,12 @@ class Customer {
   final int id;
   final String ship;
   final String supervisor;
-  final String name;
   final String username;
   final String contact;
-  final int user;
+  final int? user;
 
   const Customer({
     required this.id,
-    required this.name,
     required this.username,
     required this.user,
     required this.contact,

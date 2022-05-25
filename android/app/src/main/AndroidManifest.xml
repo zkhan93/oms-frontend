@@ -1,10 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.order">
+    package="io.zkhan93.freshfruitsandvegetables">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
    <application
-        android:label="order"
+        android:label="Order Fresh Fruits and Vegetables"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         

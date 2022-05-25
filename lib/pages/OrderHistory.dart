@@ -83,6 +83,7 @@ class _OrderHistoryState extends State<OrderHistory> {
         body: FutureProvider<OrdersModel>(
             initialData: OrdersModel(),
             create: (context) async {
+              // TODO: handle paginated response
               OrderResponse response = await globals.apiClient.getOrders();
               return OrdersModel(orders: response.results);
             },

@@ -5,13 +5,14 @@ part 'Token.g.dart';
 class Token {
   @JsonKey(name: "user_id")
   final int userId;
+  @JsonKey(name: "customer_id")
+  final int? customerId;
   final String token;
-  final String email;
   final List<String> roles;
 
   const Token(
-    this.roles, {
-    required this.email,
+    this.customerId, {
+    required this.roles,
     required this.userId,
     required this.token,
   });
