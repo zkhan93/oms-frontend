@@ -10,6 +10,7 @@ import 'package:order/pages/OrderHistory.dart';
 import 'package:order/pages/SignupPage.dart';
 import 'package:provider/provider.dart';
 import 'package:order/globals.dart' as globals;
+import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(MultiProvider(providers: [
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    imageCache.clear();
     return MaterialApp(
       title: 'Order App',
       theme: ThemeData(
@@ -38,6 +40,7 @@ class MyApp extends StatelessWidget {
           // Notice that the counter didn't reset back to zero; the application
           // is not restarted.
           // buttonTheme: ,
+
           textTheme: Typography().black.apply(fontFamily: "Quicksand"),
           // TextTheme(
           //     titleSmall: TextStyle(fontSize: 14.0, fontFamily: "OpenSans"),

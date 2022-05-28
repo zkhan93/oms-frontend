@@ -101,163 +101,194 @@ class _SignUpState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Sign Up"),
-      ),
       body: Center(
-          child: SingleChildScrollView(
-              child: Form(
-                  key: _formKey,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16.0, horizontal: 16.0),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          TextFormField(
-                            onSaved: (value) {
-                              shipName = value;
-                            },
-                            decoration: const InputDecoration(
-                                icon: Icon(Icons.sailing),
-                                labelText: 'Ship name'),
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter ship name';
-                              }
-                              if (shipErrors?.isNotEmpty ?? false) {
-                                return shipErrors?.join(",");
-                              }
-                              return null;
-                            },
-                            onEditingComplete: () =>
-                                FocusScope.of(context).nextFocus(),
+          child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Welcome!",
+                        style: Theme.of(context).textTheme.displayMedium,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "Order fresh fruits and vegetables",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      const Spacer(
+                        flex: 2,
+                      ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: Text(
+                            "Create a new account",
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          TextFormField(
-                            onSaved: (value) {
-                              shipSupervisorName = value;
-                            },
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.admin_panel_settings),
-                              labelText: 'Ship supervisor name',
-                            ),
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter ship supervisor name';
-                              }
-                              if (supervisorErrors?.isNotEmpty ?? false) {
-                                return supervisorErrors?.join(",");
-                              }
-                              return null;
-                            },
-                            onEditingComplete: () =>
-                                FocusScope.of(context).nextFocus(),
+                        ),
+                      ),
+                      TextFormField(
+                        onSaved: (value) {
+                          shipName = value;
+                        },
+                        decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.sailing),
+                            labelText: 'Ship name'),
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter ship name';
+                          }
+                          if (shipErrors?.isNotEmpty ?? false) {
+                            return shipErrors?.join(",");
+                          }
+                          return null;
+                        },
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                      ),
+                      TextFormField(
+                        onSaved: (value) {
+                          shipSupervisorName = value;
+                        },
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.admin_panel_settings),
+                          labelText: 'Ship supervisor name',
+                        ),
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter ship supervisor name';
+                          }
+                          if (supervisorErrors?.isNotEmpty ?? false) {
+                            return supervisorErrors?.join(",");
+                          }
+                          return null;
+                        },
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                      ),
+                      TextFormField(
+                        onSaved: (value) {
+                          contactNumber = value;
+                        },
+                        decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.person),
+                            labelText: 'Contact'),
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter you contact number';
+                          }
+                          if (contactErrors?.isNotEmpty ?? false) {
+                            return contactErrors!.join(",");
+                          }
+                          // check with api username should be unique
+                          return null;
+                        },
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                      ),
+                      TextFormField(
+                        onSaved: (value) {
+                          password = value;
+                        },
+                        controller: _passwordController,
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.password),
+                            labelText: 'Password'),
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please password';
+                          }
+                          if (passwordErrors?.isNotEmpty ?? false) {
+                            return contactErrors?.join(",");
+                          }
+                          return null;
+                        },
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.password),
+                          labelText: 'Confirm Password',
+                        ),
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please confirm password';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'Please do not match';
+                          }
+                          return null;
+                        },
+                        onEditingComplete: () =>
+                            FocusScope.of(context).unfocus(),
+                      ),
+                      if (_error.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: Text(
+                            _error,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: Colors.red),
                           ),
-                          TextFormField(
-                            onSaved: (value) {
-                              contactNumber = value;
-                            },
-                            decoration: const InputDecoration(
-                                icon: Icon(Icons.person), labelText: 'Contact'),
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter you contact number';
-                              }
-                              if (contactErrors?.isNotEmpty ?? false) {
-                                return contactErrors!.join(",");
-                              }
-                              // check with api username should be unique
-                              return null;
-                            },
-                            onEditingComplete: () =>
-                                FocusScope.of(context).nextFocus(),
-                          ),
-                          TextFormField(
-                            onSaved: (value) {
-                              password = value;
-                            },
-                            controller: _passwordController,
-                            obscureText: true,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            decoration: const InputDecoration(
-                                icon: Icon(Icons.password),
-                                labelText: 'Password'),
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please password';
-                              }
-                              if (passwordErrors?.isNotEmpty ?? false) {
-                                return contactErrors?.join(",");
-                              }
-                              return null;
-                            },
-                            onEditingComplete: () =>
-                                FocusScope.of(context).nextFocus(),
-                          ),
-                          TextFormField(
-                            obscureText: true,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.password),
-                              labelText: 'Confirm Password',
-                            ),
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please confirm password';
-                              }
-                              if (value != _passwordController.text) {
-                                return 'Please do not match';
-                              }
-                              return null;
-                            },
-                            onEditingComplete: () =>
-                                FocusScope.of(context).unfocus(),
-                          ),
-                          if (_error.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Text(
-                                _error,
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(color: Colors.red),
-                              ),
-                            ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16.0),
-                            child: ElevatedButton(
-                              onPressed: () => _register(),
-                              child: _loading
-                                  ? const SizedBox(
-                                      height: 24,
-                                      width: 24,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text('Sign Up'),
-                            ),
-                          ),
-                          const Padding(
-                              padding: EdgeInsets.only(top: 16.0),
-                              child: Text("Already have an account ?")),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                                16.0, 8.0, 16.0, 16.0),
-                            child: ElevatedButton(
-                              onPressed: () {
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 32.0),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.all(8),
+                              minimumSize: const Size.fromHeight(40),
+                              fixedSize: const Size.fromHeight(40)),
+                          onPressed: () => _register(),
+                          child: _loading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text('Sign Up'),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 32.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Already have an account? "),
+                            GestureDetector(
+                              onTap: () {
                                 Navigator.pop(context);
                               },
-                              child: const Text('Login'),
-                            ),
-                          ),
-                        ]),
-                  )))),
+                              child: const Text(
+                                'Log in',
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ]),
+              ))),
     );
   }
 }

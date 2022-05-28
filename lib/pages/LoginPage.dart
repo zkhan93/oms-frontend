@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:order/components/ErrorMsg.dart';
 import 'package:order/components/Loading.dart';
@@ -21,24 +19,45 @@ class _LoginState extends State<LoginPage> {
   List<String> errors = [];
   List<String> usernameErrors = [];
   List<String> passwordErrors = [];
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Login"),
-        ),
-        body: Center(
-            child: SingleChildScrollView(
-                child: Form(
-          key: _formKey,
-          child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(children: <Widget>[
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Welcome!",
+                        style: Theme.of(context).textTheme.displayMedium,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "Order fresh fruits and vegetables",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(
+                  flex: 2,
+                ),
                 TextFormField(
                   controller: _usernameController,
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
+                    prefixIcon: Icon(Icons.phone),
                     labelText: 'Contact Number',
                   ),
                   validator: (String? value) {
@@ -55,11 +74,22 @@ class _LoginState extends State<LoginPage> {
                 ),
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _obscurePassword,
                   enableSuggestions: false,
                   autocorrect: false,
-                  decoration: const InputDecoration(
-                      icon: Icon(Icons.password), labelText: 'Password'),
+                  decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.lock),
+                      labelText: 'Password',
+                      suffix: IconButton(
+                        icon: _obscurePassword
+                            ? const Icon(Icons.visibility_off)
+                            : const Icon(Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      )),
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
                       return 'Please password';
@@ -74,28 +104,46 @@ class _LoginState extends State<LoginPage> {
                 if (errors.isNotEmpty) ErrorMsg(errors: errors),
                 if (loading) const Loading(),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.only(top: 32.0),
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(8),
+                        minimumSize: const Size.fromHeight(40),
+                        fixedSize: const Size.fromHeight(40)),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         doLogin();
                       }
                     },
-                    child: const Text('Login'),
+                    child: const Text(
+                      'Login',
+                    ),
                   ),
                 ),
-                const Padding(
-                    padding: EdgeInsets.only(top: 16.0),
-                    child: Text("Don't have an account ?")),
-                Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
-                    child: ElevatedButton(
-                        child: const Text("Signup"),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/sign-up");
-                        }))
-              ])),
-        ))));
+                Center(
+                  child: Container(
+                      padding: const EdgeInsets.only(top: 64.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text("Don't have an account? "),
+                          GestureDetector(
+                              child: const Text(
+                                "Sign up",
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              onTap: () {
+                                Navigator.pushNamed(context, "/sign-up");
+                              })
+                        ],
+                      )),
+                )
+              ]),
+        ),
+      ),
+    );
   }
 
   doLogin() {
