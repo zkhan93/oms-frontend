@@ -26,121 +26,122 @@ class _LoginState extends State<LoginPage> {
     return Scaffold(
       body: Form(
         key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Welcome!",
-                        style: Theme.of(context).textTheme.displayMedium,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          "Order fresh fruits and vegetables",
-                          style: Theme.of(context).textTheme.titleMedium,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Welcome!",
+                          style: Theme.of(context).textTheme.displayMedium,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(
-                  flex: 2,
-                ),
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.phone),
-                    labelText: 'Contact Number',
-                  ),
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter contact number';
-                    }
-                    if (usernameErrors.isNotEmpty) {
-                      return usernameErrors.join("\n");
-                    }
-                    // check with api username should be unique
-                    return null;
-                  },
-                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.lock),
-                      labelText: 'Password',
-                      suffix: IconButton(
-                        icon: _obscurePassword
-                            ? const Icon(Icons.visibility_off)
-                            : const Icon(Icons.visibility),
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
-                      )),
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please password';
-                    }
-                    if (passwordErrors.isNotEmpty) {
-                      return passwordErrors.join("\n");
-                    }
-                    return null;
-                  },
-                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                ),
-                if (errors.isNotEmpty) ErrorMsg(errors: errors),
-                if (loading) const Loading(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 32.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(8),
-                        minimumSize: const Size.fromHeight(40),
-                        fixedSize: const Size.fromHeight(40)),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        doLogin();
-                      }
-                    },
-                    child: const Text(
-                      'Login',
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 32),
+                          child: Text(
+                            "Order fresh fruits and vegetables",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                Center(
-                  child: Container(
-                      padding: const EdgeInsets.only(top: 64.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text("Don't have an account? "),
-                          GestureDetector(
-                              child: const Text(
-                                "Sign up",
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                              onTap: () {
-                                Navigator.pushNamed(context, "/sign-up");
-                              })
-                        ],
-                      )),
-                )
-              ]),
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.phone),
+                      labelText: 'Contact Number',
+                    ),
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter contact number';
+                      }
+                      if (usernameErrors.isNotEmpty) {
+                        return usernameErrors.join("\n");
+                      }
+                      // check with api username should be unique
+                      return null;
+                    },
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  ),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.lock),
+                        labelText: 'Password',
+                        suffix: GestureDetector(
+                          child: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        )),
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please password';
+                      }
+                      if (passwordErrors.isNotEmpty) {
+                        return passwordErrors.join("\n");
+                      }
+                      return null;
+                    },
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  ),
+                  if (errors.isNotEmpty) ErrorMsg(errors: errors),
+                  if (loading) const Loading(),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 32.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(8),
+                          minimumSize: const Size.fromHeight(40),
+                          fixedSize: const Size.fromHeight(40)),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          doLogin();
+                        }
+                      },
+                      child: const Text(
+                        'Login',
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Container(
+                        padding: const EdgeInsets.only(top: 64.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text("Don't have an account? "),
+                            GestureDetector(
+                                child: const Text(
+                                  "Sign up",
+                                  style: TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                onTap: () {
+                                  Navigator.pushNamed(context, "/sign-up");
+                                })
+                          ],
+                        )),
+                  )
+                ]),
+          ),
         ),
       ),
     );

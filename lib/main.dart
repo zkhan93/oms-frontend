@@ -19,6 +19,17 @@ void main() {
   ], child: const MyApp()));
 }
 
+var routes = <String, WidgetBuilder>{
+  '/login': (BuildContext context) => const LoginPage(),
+  '/sign-up': (BuildContext context) => const SignUpPage(),
+  '/order-list': (BuildContext context) => const OrderHistory(),
+  '/order-detail': (BuildContext context) => const OrderDetails(),
+  '/order-create': (BuildContext context) => const OrderCreate(),
+  '/manage-products': (BuildContext context) => const AdminItemManage(),
+  '/manage-orders': (BuildContext context) => const AdminOrderList(),
+  "/manage-order-detail": (BuildContext context) => const AdminOrderDetails(),
+};
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -67,16 +78,20 @@ class MyApp extends StatelessWidget {
           return const OrderHistory();
         },
       ),
-      routes: <String, WidgetBuilder>{
-        '/login': (BuildContext context) => const LoginPage(),
-        '/sign-up': (BuildContext context) => const SignUpPage(),
-        '/order-list': (BuildContext context) => const OrderHistory(),
-        '/order-detail': (BuildContext context) => const OrderDetails(),
-        '/order-create': (BuildContext context) => const OrderCreate(),
-        '/manage-products': (BuildContext context) => const AdminItemManage(),
-        '/manage-orders': (BuildContext context) => const AdminOrderList(),
-        "/manage-order-detail": (BuildContext context) =>
-            const AdminOrderDetails(),
+      // routes: routes,
+      onGenerateRoute: (settings) {
+        debugPrint("animating ${settings.name}");
+
+        return PageRouteBuilder(
+          settings:
+              settings, // Pass this to make popUntil(), pushNamedAndRemoveUntil(), works
+          pageBuilder: (_, __, ___) => routes[settings.name]!(context),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        );
+
+        // Unknown route
+        // return MaterialPageRoute(builder: (_) => UnknownPage());
       },
     );
   }
