@@ -20,11 +20,14 @@ jobs:
         uses: gittools/actions/gitversion/execute@v0.9.7
       - name: Create version.txt with nuGetVersion
         run: echo ${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
+      - name: Show version
+        run: echo "${{ steps.gitversion.outputs.nuGetVersion  }}"
       - name: Upload version.txt
         uses: actions/upload-artifact@v2
         with:
           name: gitversion
           path: version.txt
+
   build:
     name: Build APK and Create release
     needs: [version]
