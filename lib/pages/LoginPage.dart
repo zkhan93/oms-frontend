@@ -30,13 +30,13 @@ class _LoginState extends State<LoginPage> {
           child: Padding(
             padding: const EdgeInsets.all(32.0),
             child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "Welcome!",
@@ -51,6 +51,9 @@ class _LoginState extends State<LoginPage> {
                         ),
                       ],
                     ),
+                  ),
+                  const SizedBox(
+                    height: 100,
                   ),
                   TextFormField(
                     controller: _usernameController,
@@ -83,6 +86,7 @@ class _LoginState extends State<LoginPage> {
                             _obscurePassword
                                 ? Icons.visibility_off
                                 : Icons.visibility,
+                            size: 16,
                           ),
                           onTap: () {
                             setState(() {
@@ -101,28 +105,38 @@ class _LoginState extends State<LoginPage> {
                     },
                     onEditingComplete: () => FocusScope.of(context).nextFocus(),
                   ),
-                  if (errors.isNotEmpty) ErrorMsg(errors: errors),
-                  if (loading) const Loading(),
+                  ErrorMsg(errors: errors),
                   Padding(
-                    padding: const EdgeInsets.only(top: 32.0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(8),
-                          minimumSize: const Size.fromHeight(40),
-                          fixedSize: const Size.fromHeight(40)),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          doLogin();
-                        }
-                      },
-                      child: const Text(
-                        'Login',
-                      ),
-                    ),
-                  ),
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.all(8),
+                            minimumSize: const Size.fromHeight(40),
+                            fixedSize: const Size.fromHeight(40)),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            doLogin();
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (loading)
+                              const SizedBox(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                                height: 24,
+                                width: 24,
+                              ),
+                            if (!loading) const Text('Login')
+                          ],
+                        ),
+                      )),
                   Center(
                     child: Container(
-                        padding: const EdgeInsets.only(top: 64.0),
+                        padding: const EdgeInsets.only(top: 32.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
