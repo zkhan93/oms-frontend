@@ -3,6 +3,7 @@ name: PlayStore Release
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
   version:
@@ -50,7 +51,7 @@ jobs:
       - name: Update KeyStore key password in gradle properties
         run: sed -i 's/#{KEYSTORE_KEY_NAME}#/${{ secrets.KEYSTORE_KEY_NAME }}/g' android/keystore.properties
       - name: create keystore file from secrets
-        run: echo ${{ secrets.KEYSTORE_FILE }} | base64 -d > android/keystore.jks
+        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/keystore.jks
       - uses: actions/setup-java@v1
         with:
           java-version: "11.0.15"
