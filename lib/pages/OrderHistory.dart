@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:order/components/AppDrawer.dart';
+import 'package:order/components/LoadingListItem.dart';
+import 'package:order/components/PageLoading.dart';
 import 'package:order/globals.dart' as globals;
 import 'package:order/pages/OrderDetails.dart';
 import 'package:order/services/models/Order.dart';
-import 'package:order/services/models/OrderResponse.dart';
-import 'package:provider/provider.dart';
 
 import '../components/PageMessage.dart';
 
@@ -59,12 +59,48 @@ class OrdersPageArguments {
 
 class _OrderHistoryState extends State<OrderHistory> {
   late String? message;
+  List<Order> _orders = [];
+  bool _loading = false;
+  bool _allLoaded = false;
+  String _error = "";
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-
+    _loadOrders();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        if (!_loading && !_allLoaded) _loadOrders();
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => showMessage());
+  }
+
+  _reload() {
+    setState(() {
+      _orders = [];
+      _loading = true;
+    });
+    return globals.apiClient
+        .getOrders({"limit": 10, "offset": _orders.length}).then((value) {
+      setState(() {
+        _orders = value.results;
+        _loading = false;
+      });
+    }).onError((error, stackTrace) {
+      setState(() {
+        _error = globals.getErrorMsg(error);
+        _loading = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
   }
 
   @override
@@ -80,42 +116,46 @@ class _OrderHistoryState extends State<OrderHistory> {
           },
         ),
         drawer: const AppDrawer(),
-        body: FutureProvider<OrdersModel>(
-            initialData: OrdersModel(),
-            create: (context) async {
-              // TODO: handle paginated response
-              OrderResponse response = await globals.apiClient.getOrders();
-              return OrdersModel(orders: response.results);
+        body: RefreshIndicator(
+            onRefresh: () {
+              return _reload();
             },
-            child: Consumer<OrdersModel>(builder: (context, orderModel, child) {
-              if (orderModel.error.isNotEmpty) {
-                return Center(
-                    widthFactor: 1,
-                    child: Text(
-                      orderModel.error,
-                      textAlign: TextAlign.center,
-                    ));
-              }
-              if (orderModel.orders.isNotEmpty) {
-                return ListView.builder(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(4),
-                    itemCount: orderModel.orders.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      Order order = orderModel.orders[index];
-                      String createdOn = DateFormat.yMMMEd()
-                          .format(DateTime.parse(order.created_on));
-                      return Card(
-                          child: OrderItemWidget(
-                              order: order, createdOn: createdOn));
-                    });
-              }
-              return const PageMessage(
-                  title: "You have not placed any orders!",
-                  subtitle:
-                      "Your orders will be listed here\n Click on + icon to create new order",
-                  icon: Icons.lightbulb_sharp);
-            })));
+            child: _error.isNotEmpty
+                ? PageMessage(
+                    title: "Error encountered!",
+                    subtitle: _error,
+                    icon: Icons.error,
+                    color: Colors.red[300],
+                    action: () {
+                      _error = "";
+                      _reload();
+                    },
+                    actionName: "RETRY",
+                  )
+                : _orders.isEmpty
+                    ? (_loading
+                        ? const PageLoading(message: "Loading orders...")
+                        : const PageMessage(
+                            title: "You have not placed any orders!",
+                            subtitle:
+                                "Your orders will be listed here\n Click on + icon to create new order",
+                            icon: Icons.lightbulb_sharp))
+                    : ListView.builder(
+                        controller: _scrollController,
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(4),
+                        itemCount: _orders.length + (_allLoaded ? 0 : 1),
+                        itemBuilder: (BuildContext context, int index) {
+                          if (index == _orders.length) {
+                            return const LoadingListItem();
+                          }
+                          Order order = _orders[index];
+                          String createdOn = DateFormat.yMMMEd()
+                              .format(DateTime.parse(order.created_on));
+                          return Card(
+                              child: OrderItemWidget(
+                                  order: order, createdOn: createdOn));
+                        })));
   }
 
   showMessage() {
@@ -135,5 +175,25 @@ class _OrderHistoryState extends State<OrderHistory> {
 
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+  }
+
+  _loadOrders() {
+    setState(() {
+      _loading = true;
+      _error = "";
+    });
+    globals.apiClient
+        .getOrders({"limit": 10, "offset": _orders.length}).then((value) {
+      setState(() {
+        _orders.addAll(value.results);
+        _allLoaded = value.count == _orders.length;
+        _loading = false;
+      });
+    }).onError((error, stackTrace) {
+      setState(() {
+        _loading = false;
+        _error = globals.getErrorMsg(error);
+      });
+    });
   }
 }

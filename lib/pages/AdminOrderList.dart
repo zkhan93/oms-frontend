@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:order/components/AppDrawer.dart';
+import 'package:order/components/PageLoading.dart';
 import 'package:order/components/PageMessage.dart';
 import 'package:order/globals.dart' as globals;
 import 'package:order/pages/AdminOrderDetail.dart';
-import 'package:order/pages/OrderHistory.dart';
 import 'package:order/services/models/Order.dart';
 import 'package:order/services/models/OrderResponse.dart';
-import 'package:provider/provider.dart';
 
 class AdminOrderList extends StatefulWidget {
   const AdminOrderList({Key? key}) : super(key: key);
@@ -17,54 +16,59 @@ class AdminOrderList extends StatefulWidget {
 }
 
 class _AdminOrderListState extends State<AdminOrderList> {
+  late Future<OrderResponse> _ordersResponse;
+  late List<Order> _items;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: const Text("Manage Orders")),
         drawer: const AppDrawer(),
-        body: FutureProvider<OrdersModel>(
-            initialData: OrdersModel(),
-            create: (context) async {
+        body: FutureBuilder<OrderResponse>(
+            initialData: null,
+            future: _ordersResponse,
+            builder: (BuildContext context,
+                AsyncSnapshot<OrderResponse> ordersResponseSnapshot) {
               // TODO: handle paginated response
-              try {
-                OrderResponse response = await globals.apiClient.getAllOrders();
-                return OrdersModel(orders: response.results);
-              } catch (ex) {
-                debugPrint("here");
-                debugPrint(ex.toString());
+              if (ordersResponseSnapshot.connectionState !=
+                  ConnectionState.done) {
+                return const PageLoading(message: "Loading orders...");
               }
-              return OrdersModel(orders: []);
-            },
-            child: Consumer<OrdersModel>(
-                //                    <--- Consumer
-                builder: (context, orderModel, child) {
-              if (orderModel.error.isNotEmpty) {
-                return Center(
-                    widthFactor: 1,
-                    child: Text(
-                      orderModel.error,
-                      textAlign: TextAlign.center,
-                    ));
+              if (!ordersResponseSnapshot.hasData ||
+                  ordersResponseSnapshot.data == null) {
+                return const PageMessage(
+                    title: "No orders available!",
+                    subtitle: "Orders will be listed here",
+                    icon: Icons.lightbulb_sharp);
               }
-              if (orderModel.orders.isNotEmpty) {
-                return ListView.builder(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(4),
-                    itemCount: orderModel.orders.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      Order order = orderModel.orders[index];
-                      String createdOn = DateFormat.yMMMEd()
-                          .format(DateTime.parse(order.created_on));
-                      return Card(
-                          child: ManageOrderItemWidget(
-                              order: order, createdOn: createdOn));
-                    });
-              }
-              return const PageMessage(
-                  title: "No orders available!",
-                  subtitle: "Orders will be listed here",
-                  icon: Icons.lightbulb_sharp);
-            })));
+
+              OrderResponse? response = ordersResponseSnapshot.data;
+              _items = response!.results;
+
+              return ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(4),
+                  itemCount: _items.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    Order order = _items[index];
+                    String createdOn = DateFormat.yMMMEd()
+                        .format(DateTime.parse(order.created_on));
+                    return Card(
+                        child: ManageOrderItemWidget(
+                            order: order, createdOn: createdOn));
+                  });
+            }));
+  }
+
+  @override
+  void didChangeDependencies() {
+    _ordersResponse = _loadOrders();
+    super.didChangeDependencies();
+  }
+
+  Future<OrderResponse> _loadOrders() {
+    // TODO: handle paginated response
+    return globals.apiClient.getAllOrders();
   }
 }
 

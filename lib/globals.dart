@@ -9,7 +9,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Dio getDio() {
   Dio dio = Dio();
-  dio.options = BaseOptions(receiveTimeout: 5000, connectTimeout: 5000);
+  dio.options = BaseOptions(
+    headers: {"Accept": "application/json"},
+    responseType: ResponseType.json,
+    receiveTimeout: 30000,
+    connectTimeout: 50000,
+    followRedirects: false,
+    receiveDataWhenStatusError: true,
+  );
   dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
     secureStorage.read(key: "token").then((token) {
       if (token != null && token.isNotEmpty) {
@@ -34,19 +41,20 @@ const rs = "₹";
 String getErrorMsg(ex) {
   if (ex.type == DioErrorType.response) {
     debugPrint(ex.response.toString());
-    return 'No Response from the server';
+    return 'Error response from the server';
   }
   if (ex.type == DioErrorType.connectTimeout) {
-    return 'check your connection';
+    debugPrint(ex.error.toString());
+    return 'Connection timeout';
   }
 
   if (ex.type == DioErrorType.receiveTimeout) {
-    return 'unable to connect to the server';
+    return 'Connection timeout while receiving content';
   }
 
   if (ex.type == DioErrorType.other) {
     debugPrint(ex.toString());
-    return 'Something went wrong';
+    return 'Unknown error encountered';
   }
   return ex.message;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:order/components/AppDrawer.dart';
+import 'package:order/components/PageLoading.dart';
 import 'package:order/components/PageMessage.dart';
 import 'package:order/globals.dart' as globals;
 import 'package:order/services/models/Item.dart';
@@ -29,6 +30,10 @@ class _AdminItemManageState extends State<AdminItemManage> {
             builder: (BuildContext context,
                 AsyncSnapshot<ItemsResponse> itemsResponseSnapshot) {
               debugPrint(itemsResponseSnapshot.data.toString());
+              if (itemsResponseSnapshot.connectionState !=
+                  ConnectionState.done) {
+                return const PageLoading(message: "Loading products...");
+              }
               if (!itemsResponseSnapshot.hasData ||
                   itemsResponseSnapshot.data == null) {
                 return const PageMessage(

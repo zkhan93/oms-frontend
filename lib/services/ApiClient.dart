@@ -12,8 +12,8 @@ part 'ApiClient.g.dart';
 
 const secureStorage = FlutterSecureStorage();
 
-// @RestApi(baseUrl: "http://192.168.1.56:8081/")
-@RestApi(baseUrl: "https://oms.khancave.in/")
+@RestApi(baseUrl: "http://192.168.1.56:8081/")
+// @RestApi(baseUrl: "https://oms.khancave.in/")
 abstract class ApiClient {
   factory ApiClient(Dio dio, {String? baseUrl}) {
     return _ApiClient(dio, baseUrl: baseUrl);
@@ -31,7 +31,7 @@ abstract class ApiClient {
   Future<Customer> getCustomer(@Path("id") int customerId);
 
   @GET("/order/")
-  Future<OrderResponse> getOrders();
+  Future<OrderResponse> getOrders(@Queries() Map<String, dynamic>? queries);
 
   @GET("/order/all/")
   Future<OrderResponse> getAllOrders();

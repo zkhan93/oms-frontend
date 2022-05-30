@@ -7,6 +7,7 @@ import 'package:order/pages/LoginPage.dart';
 import 'package:order/pages/OrderCreate.dart';
 import 'package:order/pages/OrderDetails.dart';
 import 'package:order/pages/OrderHistory.dart';
+import 'package:order/pages/SetDelivery.dart';
 import 'package:order/pages/SignupPage.dart';
 import 'package:provider/provider.dart';
 import 'package:order/globals.dart' as globals;
@@ -27,7 +28,8 @@ var routes = <String, WidgetBuilder>{
   '/order-create': (BuildContext context) => const OrderCreate(),
   '/manage-products': (BuildContext context) => const AdminItemManage(),
   '/manage-orders': (BuildContext context) => const AdminOrderList(),
-  "/manage-order-detail": (BuildContext context) => const AdminOrderDetails(),
+  '/manage-order-detail': (BuildContext context) => const AdminOrderDetails(),
+  '/order-delivery': (BuildContext context) => const OrderDelivery(),
 };
 
 class MyApp extends StatelessWidget {

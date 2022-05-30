@@ -10,7 +10,7 @@ part of 'ApiClient.dart';
 
 class _ApiClient implements ApiClient {
   _ApiClient(this._dio, {this.baseUrl}) {
-    baseUrl ??= 'https://oms.khancave.in/';
+    baseUrl ??= 'http://192.168.1.56:8081/';
   }
 
   final Dio _dio;
@@ -70,9 +70,11 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<OrderResponse> getOrders() async {
+  Future<OrderResponse> getOrders(queries) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.addAll(queries ?? <String, dynamic>{});
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(

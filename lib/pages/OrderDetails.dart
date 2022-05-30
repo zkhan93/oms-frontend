@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:order/components/LabelRow.dart';
+import 'package:order/components/PageLoading.dart';
+import 'package:order/components/PageMessage.dart';
 import 'package:order/globals.dart' as globals;
 import 'package:order/utils.dart' as utils;
 import 'package:order/services/models/Customer.dart';
@@ -100,8 +102,14 @@ class _OrderDetailsState extends State<OrderDetails> {
       future: _order,
       builder:
           (BuildContext context, AsyncSnapshot<OrderDetail> orderSnapshot) {
+        if (orderSnapshot.connectionState != ConnectionState.done) {
+          return const PageLoading(message: "Loading order details...");
+        }
         if (!orderSnapshot.hasData || orderSnapshot.data == null) {
-          return const Text("Details not found!");
+          return PageMessage(
+            title: "No Details not found for Order#$orderId!",
+            icon: Icons.no_food,
+          );
         }
         OrderDetail order = orderSnapshot.data as OrderDetail;
         String createdOn =

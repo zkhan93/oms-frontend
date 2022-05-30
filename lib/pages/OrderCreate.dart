@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:order/components/PageMessage.dart';
 import 'package:order/globals.dart' as globals;
 import 'package:order/pages/OrderHistory.dart';
+import 'package:order/pages/SetDelivery.dart';
 
 class OrderCreate extends StatefulWidget {
   const OrderCreate({Key? key}) : super(key: key);
@@ -28,6 +29,7 @@ class _OrderCreateState extends State<OrderCreate> {
     "quantity": "",
     "unit": "kg",
   };
+  bool _loading = false;
   @override
   Widget build(BuildContext context) {
     var itemsListView = AnimatedList(
@@ -134,21 +136,32 @@ class _OrderCreateState extends State<OrderCreate> {
                       alignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextButton(
-                          onPressed: () {
-                            // TODO: if there is content in currentItem (if either name or quantity has non empty data)
-                            // ask user to add it first before creating order
-                            _createOrder();
-                          },
-                          child: const Text(
-                            "CREATE ORDER",
-                          ),
+                          onPressed: _loading
+                              ? null
+                              : () {
+                                  // TODO: if there is content in currentItem (if either name or quantity has non empty data)
+                                  // ask user to add it first before creating order
+                                  _createOrder();
+                                },
+                          child: _loading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ))
+                              : const Text(
+                                  "CREATE ORDER",
+                                ),
                         ),
                         TextButton(
-                          onPressed: () {
-                            if (_addItemKey.currentState!.validate()) {
-                              _addOrUpdateItem();
-                            }
-                          },
+                          onPressed: _loading
+                              ? null
+                              : () {
+                                  if (_addItemKey.currentState!.validate()) {
+                                    _addOrUpdateItem();
+                                  }
+                                },
                           child: Text(
                               "${updateIndex == -1 ? 'ADD' : 'UPDATE'} ITEM"),
                         ),
@@ -238,19 +251,22 @@ class _OrderCreateState extends State<OrderCreate> {
 
   _createOrder() {
     var order = {"items": items};
+    setState(() {
+      _loading = true;
+    });
     globals.apiClient.createOrder(order).then((newOrder) {
       debugPrint("order created ${newOrder.toJson()}");
-      // setState(() {
-      //   loading = false;
-      // });
       Navigator.pop(context);
-      Navigator.popAndPushNamed(context, "/order-list",
-          arguments: OrdersPageArguments("Order created successfully"));
+      Navigator.popAndPushNamed(context, "/order-delivery",
+          arguments: OrderDeliveryArguments(newOrder.id));
+      setState(() {
+        _loading = false;
+      });
     }).catchError((error) {
       debugPrint("error occurred!");
-      // setState(() {
-      //   loading = true;
-      // });
+      setState(() {
+        _loading = false;
+      });
     });
   }
 
