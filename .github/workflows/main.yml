@@ -91,7 +91,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
-          packageName: com.fluttercicddemo
+          packageName: io.zkhan93.freshfruitsandvegetables
           releaseFiles: app-release.aab
-          track: internal
+          track: production
           whatsNewDirectory: distribution/whatsnew
