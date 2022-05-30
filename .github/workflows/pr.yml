@@ -1,0 +1,31 @@
+name: Test and Build Android
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Test flutter and Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Update KeyStore password in gradle properties
+        run: sed -i 's/#{KEYSTORE_PASS}#/${{ secrets.KEYSTORE_PASS }}/g' android/keystore.properties
+      - name: Update KeyStore key password in gradle properties
+        run: sed -i 's/#{KEYSTORE_KEY_PASS}#/${{ secrets.KEYSTORE_KEY_PASS }}/g' android/keystore.properties
+      - name: Update KeyStore key password in gradle properties
+        run: sed -i 's/#{KEYSTORE_KEY_NAME}#/${{ secrets.KEYSTORE_KEY_NAME }}/g' android/keystore.properties
+      - name: create keystore file from secrets
+        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/keystore.jks
+      - uses: actions/setup-java@v1
+        with:
+          java-version: "11.0.15"
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: "3.0.0"
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter build apk --release --split-per-abi
+      - run: flutter build appbundle
