@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:order/services/models/Customer.dart';
 import 'package:order/services/models/Item.dart';
@@ -11,12 +12,12 @@ import 'package:retrofit/retrofit.dart';
 part 'ApiClient.g.dart';
 
 const secureStorage = FlutterSecureStorage();
+String BACKEND_URL = dotenv.env["BACKEND_URL"] ?? 'https://oms.khancave.in/';
 
-@RestApi(baseUrl: "http://192.168.1.56:8081/")
-// @RestApi(baseUrl: "https://oms.khancave.in/")
+@RestApi()
 abstract class ApiClient {
-  factory ApiClient(Dio dio, {String? baseUrl}) {
-    return _ApiClient(dio, baseUrl: baseUrl);
+  factory ApiClient(Dio dio) {
+    return _ApiClient(dio, baseUrl: BACKEND_URL);
   }
 
   @POST("/api-auth/")

@@ -19,6 +19,8 @@ jobs:
         run: sed -i 's/#{KEYSTORE_KEY_NAME}#/${{ secrets.KEYSTORE_KEY_NAME }}/g' android/keystore.properties
       - name: create keystore file from secrets
         run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/keystore.jks
+      - name: Setup .env
+        run: echo "A=B" > .env
       - uses: actions/setup-java@v1
         with:
           java-version: "11.0.15"

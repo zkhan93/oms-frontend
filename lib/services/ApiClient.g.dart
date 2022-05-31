@@ -9,9 +9,7 @@ part of 'ApiClient.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps
 
 class _ApiClient implements ApiClient {
-  _ApiClient(this._dio, {this.baseUrl}) {
-    baseUrl ??= 'http://192.168.1.56:8081/';
-  }
+  _ApiClient(this._dio, {this.baseUrl});
 
   final Dio _dio;
 

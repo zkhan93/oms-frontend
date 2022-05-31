@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^9.2.0
   path_provider: ^2.0.10
   open_file: ^3.2.1
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
@@ -69,7 +70,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - .env
   #   - assets/images/splash/
   #   - images/a_dot_ham.jpeg
 
